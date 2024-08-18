@@ -40,4 +40,7 @@ io.on("connection", (socket) => {
         // console.log(newBoard,id);
         socket.in(id).emit('reset', user);
     })
+    socket.on('send_message', (id, message,user) => {
+        socket.in(id).emit('recieve_message', message,user)
+    })
 });
