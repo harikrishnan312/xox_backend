@@ -28,8 +28,9 @@ const io = require('socket.io')(server, {
 io.on("connection", (socket) => {
     console.log("connected to socket.io");
 
-    socket.on('set up', (roomData) => {
+    socket.on('set up', (roomData, user) => {
         socket.join(roomData);
+        socket.join(user);
         socket.emit('connection');
     });
     socket.on('new_board', (newBoard, id, user, isXNext) => {
@@ -40,7 +41,32 @@ io.on("connection", (socket) => {
         // console.log(newBoard,id);
         socket.in(id).emit('reset', user);
     })
-    socket.on('send_message', (id, message,user) => {
-        socket.in(id).emit('recieve_message', message,user)
+    socket.on('send_message', (id, message, user) => {
+        socket.in(id).emit('recieve_message', message, user)
+    })
+
+    socket.on("leave", (id) => {
+        socket.leave(id);
+        console.log(`left from room:${id}`)
+    })
+
+
+    socket.on("disconnect", () => {
+        socket.broadcast.emit("callEnded")
+    })
+
+    socket.on("video_chat", (user, id) => {
+        socket.in(id).emit('connect_chat', user)
+    })
+
+    socket.on("callUser", (data) => {
+        io.to(data.userToCall).emit("callUser", { signal: data.signalData, from: data.from })
+    })
+
+    socket.on("answerCall", (data) => {
+        io.to(data.to).emit("callAccepted", data.signal)
+    })
+    socket.on("callEnd", (id) => {
+        socket.in(id).emit("callEnd")
     })
 });
