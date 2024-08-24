@@ -21,8 +21,22 @@ const createGame = (req, res) => {
     }
 }
 
+const lastGame = (req, res) => {
+    try {
+        let lastGame = req.lastGame;
+
+        if (lastGame.length === 0) {
+            res.send('')
+        }
+        res.send(lastGame);
+
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 module.exports = {
     test,
     createGame,
+    lastGame
 };

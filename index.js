@@ -9,6 +9,12 @@ const corsOptions = {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type,Authorization',
 };
+let lastGame = ''
+
+app.use((req, res, next) => {
+    req.lastGame = lastGame; 
+    next();
+});
 
 app.use(cors(corsOptions));
 
@@ -30,6 +36,7 @@ io.on("connection", (socket) => {
 
     socket.on('set up', (roomData, user) => {
         socket.join(roomData);
+        lastGame = roomData;
         socket.join(user);
         socket.emit('connection');
     });
